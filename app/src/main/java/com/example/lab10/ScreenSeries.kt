@@ -30,19 +30,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.lab10.SerieApiService
+import com.example.lab10.SerieModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun ContenidoProductosListado(navController: NavHostController, servicio: ProductApiService) {
-    var listaProductos: SnapshotStateList<ProductModel> = remember { mutableStateListOf() }
+fun ContenidoSeriesListado(navController: NavHostController, servicio: SerieApiService) {
+    var listaSeries: SnapshotStateList<SerieModel> = remember { mutableStateListOf() }
     LaunchedEffect(Unit) {
-        val listado = servicio.getProducts()
-        listaProductos.addAll(listado)
+        val listado = servicio.selectSeries()
+        listado.forEach { listaSeries.add(it) }
     }
 
-    LazyColumn {
+    LazyColumn (
+
+    ){
         item {
-            Row(
+            Row (
                 modifier = Modifier.fillParentMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -53,44 +57,44 @@ fun ContenidoProductosListado(navController: NavHostController, servicio: Produc
                     modifier = Modifier.weight(0.1f)
                 )
                 Text(
-                    text = "PRODUCTO",
+                    text = "SERIE",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(0.7f)
                 )
                 Text(
-                    text = "Acción",
+                    text = "Accion",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(0.2f)
-                )
+                ) //, fontWeight = FontWeight.Bold)
             }
         }
 
-        items(listaProductos) { item ->
+        items(listaSeries) { item ->
             Row(
-                modifier = Modifier.padding(start = 8.dp).fillParentMaxWidth(),
+                modifier = Modifier.padding(start=8.dp).fillParentMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "${item.id}", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.1f))
-                Text(text = item.name, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(0.6f))
+                Text(text = "${item.id}", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier=Modifier.weight(0.1f))
+                Text(text = item.name, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier=Modifier.weight(0.6f))
                 IconButton(
                     onClick = {
-                        navController.navigate("productoVer/${item.id}")
-                        Log.e("PRODUCTO-VER", "ID = ${item.id}")
+                        navController.navigate("serieVer/${item.id}")
+                        Log.e("SERIE-VER","ID = ${item.id}")
                     },
                     Modifier.weight(0.1f)
                 ) {
-                    Icon(imageVector = Icons.Outlined.Edit, contentDescription = "Ver")
+                    Icon(imageVector = Icons.Outlined.Edit, contentDescription = "Ver", modifier=Modifier.align(Alignment.CenterVertically))
                 }
                 IconButton(
                     onClick = {
-                        navController.navigate("productoDel/${item.id}")
-                        Log.e("PRODUCTO-DEL", "ID = ${item.id}")
+                        navController.navigate("serieDel/${item.id}")
+                        Log.e("SERIE-DEL","ID = ${item.id}")
                     },
                     Modifier.weight(0.1f)
                 ) {
-                    Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Eliminar")
+                    Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Ver", modifier=Modifier.align(Alignment.CenterVertically))
                 }
             }
         }
@@ -98,22 +102,22 @@ fun ContenidoProductosListado(navController: NavHostController, servicio: Produc
 }
 
 @Composable
-fun ContenidoProductoEditar(navController: NavHostController, servicio: ProductApiService, pid: Int = 0) {
+fun ContenidoSerieEditar(navController: NavHostController, servicio: SerieApiService, pid: Int = 0 ) {
     var id by remember { mutableStateOf<Int>(pid) }
     var name by remember { mutableStateOf<String?>("") }
-    var price by remember { mutableStateOf<String?>("") }
-    var description by remember { mutableStateOf<String?>("") }
+    var release_date by remember { mutableStateOf<String?>("") }
+    var rating by remember { mutableStateOf<String?>("") }
     var category by remember { mutableStateOf<String?>("") }
     var grabar by remember { mutableStateOf(false) }
 
     if (id != 0) {
         LaunchedEffect(Unit) {
-            val objProducto = servicio.getProduct(id.toString())
+            val objSerie = servicio.selectSerie(id.toString())
             delay(100)
-            name = objProducto.body()?.name
-            price = objProducto.body()?.price.toString()
-            description = objProducto.body()?.description
-            category = objProducto.body()?.category
+            name = objSerie.body()?.name
+            release_date = objSerie.body()?.release_date
+            rating = objSerie.body()?.rating.toString()
+            category = objSerie.body()?.category
         }
     }
 
@@ -121,7 +125,8 @@ fun ContenidoProductoEditar(navController: NavHostController, servicio: ProductA
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-    ) {
+    ){
+        // Spacer(Modifier.height(50.dp))
         TextField(
             value = id.toString(),
             onValueChange = { },
@@ -130,27 +135,27 @@ fun ContenidoProductoEditar(navController: NavHostController, servicio: ProductA
             singleLine = true
         )
         TextField(
-            value = name ?: "",
+            value = name!!,
             onValueChange = { name = it },
-            label = { Text("Nombre: ") },
+            label = { Text("Name: ") },
             singleLine = true
         )
         TextField(
-            value = price ?: "",
-            onValueChange = { price = it },
-            label = { Text("Precio:") },
+            value = release_date!!,
+            onValueChange = { release_date = it },
+            label = { Text("Release Date:") },
             singleLine = true
         )
         TextField(
-            value = description ?: "",
-            onValueChange = { description = it },
-            label = { Text("Descripción:") },
+            value = rating!!,
+            onValueChange = { rating = it },
+            label = { Text("Rating:") },
             singleLine = true
         )
         TextField(
-            value = category ?: "",
+            value = category!!,
             onValueChange = { category = it },
-            label = { Text("Categoría:") },
+            label = { Text("Category:") },
             singleLine = true
         )
         Button(
@@ -158,25 +163,25 @@ fun ContenidoProductoEditar(navController: NavHostController, servicio: ProductA
                 grabar = true
             }
         ) {
-            Text("Grabar", fontSize = 16.sp)
+            Text("Grabar", fontSize=16.sp)
         }
     }
 
     if (grabar) {
-        val objProducto = ProductModel(id, name ?: "", price?.toDouble() ?: 0.0, description ?: "", category ?: "")
+        val objSerie = SerieModel(id,name!!, release_date!!, rating!!.toInt(), category!!)
         LaunchedEffect(Unit) {
             if (id == 0)
-                servicio.addProduct(objProducto)
+                servicio.insertSerie(objSerie)
             else
-                servicio.updateProduct(id.toString(), objProducto)
+                servicio.updateSerie(id.toString(), objSerie)
         }
         grabar = false
-        navController.navigate("productos")
+        navController.navigate("series")
     }
 }
 
 @Composable
-fun ContenidoProductoEliminar(navController: NavHostController, servicio: ProductApiService, id: Int) {
+fun ContenidoSerieEliminar(navController: NavHostController, servicio: SerieApiService, id: Int) {
     var showDialog by remember { mutableStateOf(true) }
     var borrar by remember { mutableStateOf(false) }
 
@@ -184,29 +189,31 @@ fun ContenidoProductoEliminar(navController: NavHostController, servicio: Produc
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Text(text = "Confirmar Eliminación") },
-            text = { Text("¿Está seguro de eliminar el producto?") },
+            text = {  Text("¿Está seguro de eliminar la Serie?") },
             confirmButton = {
                 Button(
                     onClick = {
                         showDialog = false
                         borrar = true
-                    }
-                ) {
+                    } ) {
                     Text("Aceptar")
                 }
             },
             dismissButton = {
-                Button(onClick = { showDialog = false }) {
+                Button( onClick = { showDialog = false } ) {
                     Text("Cancelar")
+                    navController.navigate("series")
                 }
             }
         )
     }
     if (borrar) {
         LaunchedEffect(Unit) {
-            servicio.deleteProduct(id.toString())
+            // val objSerie = servicio.selectSerie(id.toString())
+            servicio.deleteSerie(id.toString())
             borrar = false
-            navController.navigate("productos")
+            navController.navigate("series")
         }
     }
 }
+

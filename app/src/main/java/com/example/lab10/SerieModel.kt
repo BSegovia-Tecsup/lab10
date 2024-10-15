@@ -2,15 +2,16 @@ package com.example.lab10
 
 import com.google.gson.annotations.SerializedName
 
-data class ProductModel(
+data class SerieModel(
     @SerializedName("id")
-    var id: Int,
+    var id:Int,
     @SerializedName("name")
-    var name: String,
-    @SerializedName("price")
-    var price: Double,
-    @SerializedName("description")
-    var description: String,
+    var name:String,
+    @SerializedName("release_date")
+    var release_date:String,
+    @SerializedName("rating")
+    var rating:Int,
     @SerializedName("category")
-    var category: String
+    var category:String
 )
+

@@ -9,20 +9,21 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
-interface ProductApiService {
-    @GET("products")
-    suspend fun getProducts(): ArrayList<ProductModel>
+interface SerieApiService {
+    @GET("serie")
+    suspend fun selectSeries():ArrayList<SerieModel>
 
-    @GET("products/{id}")
-    suspend fun getProduct(@Path("id") id: String): Response<ProductModel>
+    @GET("serie/{id}")
+    suspend fun selectSerie(@Path("id") id:String): Response<SerieModel>
 
     @Headers("Content-Type: application/json")
-    @POST("products")
-    suspend fun addProduct(@Body product: ProductModel): Response<ProductModel>
+    @POST("serie")
+    suspend fun insertSerie(@Body serie: SerieModel): Response<SerieModel>
 
-    @PUT("products/{id}")
-    suspend fun updateProduct(@Path("id") id: String, @Body product: ProductModel): Response<ProductModel>
+    @PUT("serie/{id}")
+    suspend fun updateSerie(@Path("id") id:String, @Body serie: SerieModel): Response<SerieModel>
 
-    @DELETE("products/{id}")
-    suspend fun deleteProduct(@Path("id") id: String): Response<ProductModel>
+    @DELETE("serie/{id}")
+    suspend fun deleteSerie(@Path("id") id:String): Response<SerieModel>
 }
+
